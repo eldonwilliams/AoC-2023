@@ -17,13 +17,13 @@ function traceOutNumber(element, start) {
     while (failed != 2) {
         failed = 0;
         boundMin--;
-        if (element.charAt(boundMin).match(/[0-9]/) == null) {
+        if (!isNumeric(element.charAt(boundMin))) {
             boundMin++;
             failed++;
         }
 
         boundMax++;
-        if (element.charAt(boundMax).match(/[0-9]/) == null) {
+        if (!isNumeric(element.charAt(boundMax))) {
             boundMax--;
             failed++;
         }
@@ -32,94 +32,53 @@ function traceOutNumber(element, start) {
     return [boundMin, boundMax];
 }
 
-function getNumbersAroundGear(element, i, j) {
+function getNumbersAround(i, j) {
+    const current = splitLine[i];
     const prev = splitLine[i - 1] || "";
     const next = splitLine[i + 1] || "";
 
-    const surrounding = [];
+    const segments = [prev, current, next];
 
-    surrounding.push([prev.charAt(j - 1),
-        prev.charAt(j), prev.charAt(j + 1)],
-        [element.charAt(j - 1), ".", element.charAt(j + 1)],
-        [next.charAt(j - 1), next.charAt(j), next.charAt(j + 1)]);
+    const value = [];
 
-    const returnValue = [];
+    for (let k = 0; k < segments.length; k++) {
+        const segment = segments[k];
+        let hitNum = false;
+        for (let i = j - 1; i <= j + 1 && value.length < 2; i++) {
+            console.log(segment);
+            if (isNumeric(segment[i] || ".") && !hitNum) {
+                hitNum = true;
+                const [min, max] = traceOutNumber(segment, i);
 
-    const surroundingBase = surrounding.flat();
+                let v = "";
 
-    for (let i = 0; i < surroundingBase.length && returnValue.length < 2; i++) {
-        if (surroundingBase[i].match(/[0-9]/) != null) {
-            let from = element;
-            let start = 0;
-            switch (i) {
-                case 0:
-                    start = j - 1;
-                    from = prev;
-                    break;
-                case 1:
-                    start = j;
-                    from = prev;
-                    break;
-                case 2:
-                    start = j + 1;
-                    from = prev;
-                    break;
-                case 3:
-                    start = j - 1;
-                    break;
-                case 5:
-                    start = j + 1;
-                    break;
-                case 6:
-                    start = j - 1;
-                    from = next;
-                    break;
-                case 7:
-                    start = j;
-                    from = next;
-                    break;
-                case 8:
-                    start = j + 1;
-                    from = next;
-                    break;
+                for (let j = min; j <= max; j++) {
+                    v += segment[j];
+                }
+
+                value.push(parseInt(v));
             }
-
-            const [min, max] = traceOutNumber(from, start);
-
-            let value = "";
-
-            for (let i = min; i <= max; i++) {
-                value += from.charAt(i);
+            
+            if (!isNumeric(segment[i] || ".")) {
+                hitNum = false;
             }
-
-            returnValue.push(parseInt(value));
-
-            if (isNumeric(surroundingBase[i + 1] || ".")) {
-                i = Math.floor(i / 3) * 3 + 3;
-                continue;
-            }
-
-            i++;
         }
     }
 
-    console.log(returnValue);
-
-    return returnValue;
+    return value;
 }
 
 let answer = 0;
 
 for (let i = 0; i < splitLine.length; i++) {
-    const element = splitLine[i];
+    for (let j = 0; j < splitLine[i].length; j++) {
+        if (splitLine[i] && splitLine[i][j] == "*") {
+            const [a, b] = getNumbersAround(i, j);
 
-    for (let j = 0; j < element.length; j++) {
-        if (element.charAt(j) != "*") continue;
-        const [a, b] = getNumbersAroundGear(element, i, j);
+            if (a == undefined || b == undefined) continue;
 
-        if (a == undefined || b == undefined) continue;
-
-        answer += a * b;
+            answer += a * b;
+        }
     }
 }
 
