@@ -4,13 +4,16 @@
   "description": "",
   "main": "",
   "scripts": {
-    "1": "tsc && node dist/problem1.js",
-    "2": "tsc && node dist/problem2.js"
+    "1": "tsc && node dist/day-9/problem1.js",
+    "2": "tsc && node dist/day-9/problem2.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4"
   }
 }
